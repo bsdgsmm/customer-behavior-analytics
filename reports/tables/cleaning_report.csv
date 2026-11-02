@@ -1,0 +1,11 @@
+step,rows_removed,rows_remaining
+raw rows,0,541909
+invalid or missing order date,0,541909
+non-numeric quantity or unit price,0,541909
+missing customer id,135080,406829
+duplicate lines,5227,401602
+cancellation invoices,8872,392730
+purchases reversed by a matching cancellation,2761,389969
+non-merchandise codes,1501,388468
+non-positive quantity,0,388468
+non-positive unit price,34,388434

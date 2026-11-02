@@ -1,0 +1,55 @@
+{
+  "kpis": {
+    "total_revenue": 8350893.51,
+    "total_orders": 18281,
+    "unique_customers": 4324,
+    "unique_products": 3646,
+    "countries": 37,
+    "total_units_sold": 4918183,
+    "average_order_value": 456.81,
+    "average_units_per_order": 269.03,
+    "first_order_date": "2010-12-01",
+    "last_order_date": "2011-12-09"
+  },
+  "cancellations": {
+    "cancellation_lines": 8872,
+    "cancelled_value": 608689.47
+  },
+  "repeat_purchases": {
+    "customers": 4324,
+    "repeat_customers": 2822,
+    "one_time_customers": 1502,
+    "repeat_purchase_rate": 0.6526,
+    "repeat_customer_revenue": 7809843.17,
+    "repeat_customer_revenue_share": 0.9352,
+    "repeat_customer_order_share": 0.9178
+  },
+  "days_to_second_order": {
+    "median": 51.0,
+    "mean": 77.1779
+  },
+  "lifetime_revenue": {
+    "mean": 1931.289,
+    "median": 656.43,
+    "p75": 1615.7875,
+    "p90": 3494.278,
+    "p99": 17329.2515,
+    "max": 278778.02
+  },
+  "rfm_snapshot_date": "2011-12-10",
+  "partial_months": [
+    "2011-12"
+  ],
+  "figures": [
+    "reports/figures/monthly_revenue_trend.png",
+    "reports/figures/monthly_new_vs_returning_customers.png",
+    "reports/figures/customer_segment_distribution.png",
+    "reports/figures/revenue_by_segment.png",
+    "reports/figures/repeat_vs_one_time_customers.png",
+    "reports/figures/rfm_segment_comparison.png",
+    "reports/figures/top_products_by_revenue.png",
+    "reports/figures/country_revenue.png",
+    "reports/figures/revenue_concentration.png",
+    "reports/figures/cohort_retention_heatmap.png"
+  ]
+}

@@ -68,7 +68,11 @@ def test_revenue_by_period(transactions):
 
 def test_month_coverage_flags_only_truncated_edges():
     frame = pd.DataFrame(
-        {"order_date": pd.to_datetime(["2011-01-01", "2011-01-31", "2011-02-01", "2011-02-28", "2011-03-01", "2011-03-09"])}
+        {
+            "order_date": pd.to_datetime(
+                ["2011-01-01", "2011-01-31", "2011-02-01", "2011-02-28", "2011-03-01", "2011-03-09"]
+            )
+        }
     )
     frame["order_month"] = frame["order_date"].dt.to_period("M").dt.to_timestamp()
     coverage = month_coverage(frame)

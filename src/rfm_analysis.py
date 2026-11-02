@@ -52,6 +52,9 @@ class RFMConfig:
             raise ValueError(f"Segment rules must assign every R and FM score pair exactly once; check {gaps}")
 
 
+DEFAULT_RFM_CONFIG = RFMConfig()
+
+
 def percentile_score(values: pd.Series, levels: int, higher_is_better: bool = True) -> pd.Series:
     percentile = values.rank(method="min", pct=True, ascending=higher_is_better)
     return np.ceil(percentile * levels).clip(1, levels).astype(int)
@@ -63,7 +66,7 @@ def resolve_snapshot_date(transactions: pd.DataFrame, config: RFMConfig) -> pd.T
     return transactions["order_date"].max().normalize() + pd.Timedelta(days=1)
 
 
-def calculate_rfm(transactions: pd.DataFrame, config: RFMConfig = RFMConfig()) -> pd.DataFrame:
+def calculate_rfm(transactions: pd.DataFrame, config: RFMConfig = DEFAULT_RFM_CONFIG) -> pd.DataFrame:
     snapshot = resolve_snapshot_date(transactions, config)
     history = transactions[transactions["order_date"] < snapshot]
     if history.empty:
@@ -91,7 +94,9 @@ def calculate_rfm(transactions: pd.DataFrame, config: RFMConfig = RFMConfig()) -
 
 
 def assign_segments(
-    recency_score: pd.Series, frequency_monetary_score: pd.Series, rules: tuple[SegmentRule, ...] = DEFAULT_SEGMENT_RULES
+    recency_score: pd.Series,
+    frequency_monetary_score: pd.Series,
+    rules: tuple[SegmentRule, ...] = DEFAULT_SEGMENT_RULES,
 ) -> pd.Series:
     conditions = [rule.matches(recency_score, frequency_monetary_score) for rule in rules]
     names = [rule.name for rule in rules]
