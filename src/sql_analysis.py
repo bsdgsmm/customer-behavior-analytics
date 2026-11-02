@@ -8,7 +8,17 @@ from src.config import SQL_DIR, TABLES_DIR
 
 SQL_FILES = ("customer_metrics.sql", "revenue_analysis.sql")
 VIEW_PATTERN = re.compile(r"CREATE\s+OR\s+REPLACE\s+VIEW\s+(\w+)", re.IGNORECASE)
-TRANSACTION_COLUMNS = ["order_id", "customer_id", "order_date", "product_id", "product_name", "quantity", "revenue", "country"]
+EXPORT_EXCLUDED_VIEWS = frozenset({"orders"})
+TRANSACTION_COLUMNS = [
+    "order_id",
+    "customer_id",
+    "order_date",
+    "product_id",
+    "product_name",
+    "quantity",
+    "revenue",
+    "country",
+]
 
 
 def create_connection(transactions: pd.DataFrame) -> duckdb.DuckDBPyConnection:
@@ -54,6 +64,8 @@ def export_sql_results(results: dict[str, pd.DataFrame], output_dir: Path = TABL
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = []
     for name, frame in results.items():
+        if name in EXPORT_EXCLUDED_VIEWS:
+            continue
         path = output_dir / f"{name}.csv"
         frame.to_csv(path, index=False)
         paths.append(path)

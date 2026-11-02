@@ -71,7 +71,8 @@ def test_cohort_retention_matches_pandas(transactions, sql_results):
 
 def test_export_writes_csv_files(tmp_path, sql_results):
     paths = export_sql_results(sql_results, tmp_path)
-    assert len(paths) == len(sql_results)
+    assert len(paths) == len(sql_results) - 1
+    assert not (tmp_path / "orders.csv").exists()
     assert all(path.exists() and path.stat().st_size > 0 for path in paths)
 
 
