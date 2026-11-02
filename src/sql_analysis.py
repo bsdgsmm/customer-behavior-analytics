@@ -67,6 +67,6 @@ def export_sql_results(results: dict[str, pd.DataFrame], output_dir: Path = TABL
         if name in EXPORT_EXCLUDED_VIEWS:
             continue
         path = output_dir / f"{name}.csv"
-        frame.to_csv(path, index=False)
+        frame.to_csv(path, index=False, lineterminator="\n")
         paths.append(path)
     return paths
