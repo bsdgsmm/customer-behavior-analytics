@@ -26,3 +26,17 @@ def _raw_rows():
 def raw_source_frame():
     columns = ["InvoiceNo", "StockCode", "Description", "Quantity", "InvoiceDate", "UnitPrice", "CustomerID", "Country"]
     return pd.DataFrame(_raw_rows(), columns=columns)
+
+
+@pytest.fixture
+def raw_transactions(raw_source_frame):
+    from src.data_loader import standardize_columns
+
+    return standardize_columns(raw_source_frame)
+
+
+@pytest.fixture
+def cleaning_result(raw_transactions):
+    from src.data_cleaning import clean_transactions
+
+    return clean_transactions(raw_transactions)
