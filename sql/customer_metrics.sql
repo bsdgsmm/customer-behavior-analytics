@@ -9,7 +9,8 @@ SELECT
     SUM(quantity) AS units,
     ROUND(SUM(revenue), 2) AS revenue
 FROM transactions
-GROUP BY order_id;
+GROUP BY order_id
+ORDER BY order_id;
 
 CREATE OR REPLACE VIEW customer_summary AS
 SELECT
@@ -22,7 +23,8 @@ SELECT
     ROUND(SUM(revenue) / COUNT(DISTINCT order_id), 2) AS average_order_value,
     COUNT(DISTINCT order_id) >= 2 AS is_repeat_customer
 FROM orders
-GROUP BY customer_id;
+GROUP BY customer_id
+ORDER BY customer_id;
 
 CREATE OR REPLACE VIEW repeat_purchase_metrics AS
 SELECT
