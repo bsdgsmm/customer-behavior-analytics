@@ -1,0 +1,10 @@
+[project]
+name = "customer-behavior-analytics"
+version = "1.0.0"
+description = "Customer purchasing behavior, RFM segmentation, retention, and revenue analysis with Python, Pandas, and SQL."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
