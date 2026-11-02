@@ -42,6 +42,18 @@ def is_cancellation(order_ids: pd.Series) -> pd.Series:
     return order_ids.astype("string").str.upper().str.startswith(CANCELLATION_PREFIX).fillna(False).astype(bool)
 
 
+def match_cancelled_purchases(purchases: pd.DataFrame, cancellations: pd.DataFrame) -> pd.Index:
+    keys = ["customer_id", "product_id", "unit_price", "quantity"]
+    purchase_lines = purchases[keys + ["order_date"]].rename_axis("purchase_index").reset_index()
+    cancellation_lines = cancellations[keys + ["order_date"]].rename_axis("cancellation_index").reset_index()
+    cancellation_lines["quantity"] = -cancellation_lines["quantity"]
+    candidates = cancellation_lines.merge(purchase_lines, on=keys, suffixes=("_cancellation", "_purchase"))
+    candidates = candidates[candidates["order_date_purchase"] <= candidates["order_date_cancellation"]]
+    candidates = candidates.sort_values(["order_date_purchase", "purchase_index"], ascending=False)
+    matches = candidates.drop_duplicates("cancellation_index").drop_duplicates("purchase_index")
+    return pd.Index(matches["purchase_index"])
+
+
 def canonical_product_names(frame: pd.DataFrame) -> pd.Series:
     named = frame.dropna(subset=["product_name"])
     counts = named.groupby(["product_id", "product_name"]).size().rename("lines").reset_index()
@@ -77,6 +89,9 @@ def clean_transactions(
     recorder.drop("duplicate lines", frame.duplicated(keep="first"))
     frame = recorder.frame
     cancellations = recorder.drop("cancellation invoices", is_cancellation(frame["order_id"]))
+    frame = recorder.frame
+    reversed_purchases = match_cancelled_purchases(frame, cancellations)
+    recorder.drop("purchases reversed by a matching cancellation", pd.Series(frame.index.isin(reversed_purchases), index=frame.index))
     frame = recorder.frame
     recorder.drop("non-merchandise codes", frame["product_id"].isin(non_merchandise_codes))
     frame = recorder.frame
