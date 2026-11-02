@@ -13,8 +13,8 @@ def repeat_purchase_summary(transactions: pd.DataFrame) -> dict:
     total_revenue = customers["revenue"].sum()
     total_orders = customers["orders"].sum()
     return {
-        "customers": int(len(customers)),
-        "repeat_customers": int(len(repeat)),
+        "customers": len(customers),
+        "repeat_customers": len(repeat),
         "one_time_customers": int(len(customers) - len(repeat)),
         "repeat_purchase_rate": float(len(repeat) / len(customers)) if len(customers) else 0.0,
         "repeat_customer_revenue": float(repeat["revenue"].sum()),
@@ -56,7 +56,9 @@ def monthly_customer_activity(transactions: pd.DataFrame) -> pd.DataFrame:
     orders = build_orders(transactions)
     acquisition = orders.groupby("customer_id")["order_month"].min().rename("acquisition_month")
     orders = orders.join(acquisition, on="customer_id")
-    orders["customer_status"] = (orders["order_month"] == orders["acquisition_month"]).map({True: "new", False: "returning"})
+    orders["customer_status"] = (orders["order_month"] == orders["acquisition_month"]).map(
+        {True: "new", False: "returning"}
+    )
     active = orders.groupby(["order_month", "customer_status"])["customer_id"].nunique().unstack(fill_value=0)
     revenue = orders.groupby(["order_month", "customer_status"])["revenue"].sum().unstack(fill_value=0.0)
     table = pd.DataFrame(
@@ -87,9 +89,7 @@ def cohort_activity(transactions: pd.DataFrame) -> pd.DataFrame:
 def observable_periods(cohort_table: pd.DataFrame, last_month: pd.Timestamp) -> pd.DataFrame:
     cohorts = pd.Series(cohort_table.index, index=cohort_table.index)
     horizon = months_between(cohorts, pd.Series(last_month, index=cohort_table.index))
-    return pd.DataFrame(
-        {period: horizon >= period for period in cohort_table.columns}, index=cohort_table.index
-    )
+    return pd.DataFrame({period: horizon >= period for period in cohort_table.columns}, index=cohort_table.index)
 
 
 def _cohort_pivot(transactions: pd.DataFrame, values: str, aggfunc: str) -> pd.DataFrame:
@@ -134,7 +134,15 @@ def customer_lifetime_revenue(transactions: pd.DataFrame) -> pd.DataFrame:
     customers = build_customer_summary(transactions)
     customers["observed_days"] = (transactions["order_date"].max() - customers["first_order_date"]).dt.days
     return customers[
-        ["customer_id", "acquisition_month", "first_order_date", "last_order_date", "observed_days", "orders", "revenue"]
+        [
+            "customer_id",
+            "acquisition_month",
+            "first_order_date",
+            "last_order_date",
+            "observed_days",
+            "orders",
+            "revenue",
+        ]
     ].rename(columns={"revenue": "lifetime_revenue"})
 
 

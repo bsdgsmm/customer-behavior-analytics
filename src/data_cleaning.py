@@ -4,9 +4,7 @@ import pandas as pd
 
 from src.config import CANCELLATIONS_PATH, CLEAN_TRANSACTIONS_PATH, REQUIRED_COLUMNS
 
-NON_MERCHANDISE_CODES = frozenset(
-    {"POST", "DOT", "M", "C2", "D", "S", "BANK CHARGES", "AMAZONFEE", "CRUK", "B"}
-)
+NON_MERCHANDISE_CODES = frozenset({"POST", "DOT", "M", "C2", "D", "S", "BANK CHARGES", "AMAZONFEE", "CRUK", "B"})
 CANCELLATION_PREFIX = "C"
 
 
@@ -91,7 +89,10 @@ def clean_transactions(
     cancellations = recorder.drop("cancellation invoices", is_cancellation(frame["order_id"]))
     frame = recorder.frame
     reversed_purchases = match_cancelled_purchases(frame, cancellations)
-    recorder.drop("purchases reversed by a matching cancellation", pd.Series(frame.index.isin(reversed_purchases), index=frame.index))
+    recorder.drop(
+        "purchases reversed by a matching cancellation",
+        pd.Series(frame.index.isin(reversed_purchases), index=frame.index),
+    )
     frame = recorder.frame
     recorder.drop("non-merchandise codes", frame["product_id"].isin(non_merchandise_codes))
     frame = recorder.frame
@@ -133,7 +134,13 @@ def save_cleaning_outputs(result: CleaningResult) -> None:
 def load_clean_transactions(path=CLEAN_TRANSACTIONS_PATH) -> pd.DataFrame:
     frame = pd.read_csv(
         path,
-        dtype={"order_id": "string", "product_id": "string", "customer_id": "string", "product_name": "string", "country": "string"},
+        dtype={
+            "order_id": "string",
+            "product_id": "string",
+            "customer_id": "string",
+            "product_name": "string",
+            "country": "string",
+        },
         parse_dates=["order_date", "order_month"],
     )
     return frame

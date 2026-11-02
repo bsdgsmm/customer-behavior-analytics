@@ -57,7 +57,7 @@ def revenue_concentration(
     total = revenue.sum()
     rows = []
     for share in shares:
-        top_n = max(1, int(round(len(revenue) * share)))
+        top_n = max(1, round(len(revenue) * share))
         top_revenue = revenue.head(top_n).sum()
         rows.append(
             {
