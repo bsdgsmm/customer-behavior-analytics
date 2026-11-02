@@ -1,6 +1,12 @@
+import pandas as pd
 import pytest
 
-from src.data_cleaning import clean_transactions, is_cancellation, validate_clean_transactions
+from src.data_cleaning import (
+    clean_transactions,
+    is_cancellation,
+    match_cancelled_purchases,
+    validate_clean_transactions,
+)
 
 
 def step_counts(result):
@@ -13,6 +19,7 @@ def test_cleaning_steps_remove_expected_rows(cleaning_result):
     assert counts["missing customer id"] == 3
     assert counts["duplicate lines"] == 1
     assert counts["cancellation invoices"] == 2
+    assert counts["purchases reversed by a matching cancellation"] == 1
     assert counts["non-merchandise codes"] == 1
     assert counts["non-positive quantity"] == 1
     assert counts["non-positive unit price"] == 1
@@ -61,3 +68,24 @@ def test_validation_flags_problems(cleaning_result):
 def test_missing_columns_raise(raw_transactions):
     with pytest.raises(ValueError):
         clean_transactions(raw_transactions.drop(columns=["country"]))
+
+
+def test_cancellation_only_reverses_earlier_identical_purchase():
+    columns = ["customer_id", "product_id", "unit_price", "quantity", "order_date"]
+    purchases = pd.DataFrame(
+        [
+            ("1", "A", 2.0, 5, pd.Timestamp("2011-01-01")),
+            ("1", "A", 2.0, 5, pd.Timestamp("2011-03-01")),
+            ("1", "A", 2.0, 4, pd.Timestamp("2011-01-15")),
+        ],
+        columns=columns,
+        index=[10, 11, 12],
+    )
+    cancellations = pd.DataFrame(
+        [
+            ("1", "A", 2.0, -5, pd.Timestamp("2011-02-01")),
+            ("1", "A", 2.0, -5, pd.Timestamp("2010-12-01")),
+        ],
+        columns=columns,
+    )
+    assert list(match_cancelled_purchases(purchases, cancellations)) == [10]
